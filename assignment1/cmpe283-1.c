@@ -171,19 +171,19 @@ detect_vmx_features(void)
 	rdmsr(IA32_VMX_PINBASED_CTLS, lo, hi);
 	pr_info("Procbased Controls MSR: 0x%llx\n",
 		(uint64_t)(lo | (uint64_t)hi << 32));
-	report_capability(procbased, 5, lo, hi);
+	report_capability(procbased, 22, lo, hi);
 
 	/* Exit controls */
 	rdmsr(IA32_VMX_PINBASED_CTLS, lo, hi);
 	pr_info("Exit Controls MSR: 0x%llx\n",
 		(uint64_t)(lo | (uint64_t)hi << 32));
-	report_capability(exits, 5, lo, hi);
+	report_capability(exits, 17, lo, hi);
 
 	/* Entry controls */
 	rdmsr(IA32_VMX_PINBASED_CTLS, lo, hi);
 	pr_info("Entry Controls MSR: 0x%llx\n",
 		(uint64_t)(lo | (uint64_t)hi << 32));
-	report_capability(entries, 5, lo, hi);
+	report_capability(entries, 13, lo, hi);
 }
 
 /*
