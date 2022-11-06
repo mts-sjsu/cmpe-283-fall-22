@@ -45,7 +45,7 @@ struct capability_info pinbased[5] =
 
 /*
  * Procbased capabilities
- * See SDM volume 3, section 24.6.2
+ * See SDM volume 3, section 24.6.2, Table 24-6
  */
 struct capability_info procbased[22] =
 {
@@ -71,6 +71,43 @@ struct capability_info procbased[22] =
 	{ 29, "MONITOR Exiting" },
 	{ 30, "PAUSE Exiting" },
 	{ 31, "Activate Secondary Controls" }
+};
+
+
+/*
+ * Procbased capabilities secondary
+ * See SDM volume 3, section 24.6.2, Table 24-7
+ */
+struct capability_info procbased2[28] =
+{
+	{ 0, "Virtualize APIC Accesses" },
+	{ 1, "Enable EPT" },
+	{ 2, "Descriptor-table Exiting" },
+	{ 3, "Enable RDTSCP" },
+	{ 4, "Virtualize x2APIC Mode" },
+	{ 5, "Enable VPID" },
+	{ 6, "WBINVD Exiting" },
+	{ 7, "Unrestricted Guest" },
+	{ 8, "APIC-register Virtualization" },
+	{ 9, "Virtual-interrupt Delivery" },
+	{ 10, "PAUSE-loop Exiting" },
+	{ 11, "RDRAND Exiting" },
+	{ 12, "Enable INVPCID" },
+	{ 13, "Enable VM Functions" },
+	{ 14, "VMCS Shadowing" },
+	{ 15, "Enable ENCLS Exiting" },
+	{ 16, "RDSEED Exiting" },
+	{ 17, "Enable PML" },
+	{ 18, "EPT-violation #VE" },
+	{ 19, "Conceal VMX from PT" },
+	{ 20, "Enable XSAVES/XRSTORS" },
+	{ 22, "Mode-based Execute Control for EPT" },
+	{ 23, "Sub-page Write Permissions for EPT" },
+	{ 24, "Intel PT Uses Guest Physical Addresses" },
+	{ 25, "Use TSC Scaling" },
+	{ 26, "Enable User Wait and Pause" },
+	{ 27, "Enable PCONFIG" },
+	{ 28, "Enable ENCLV Exiting" }	
 };
 
 /*
@@ -172,6 +209,12 @@ detect_vmx_features(void)
 	pr_info("Procbased Controls MSR: 0x%llx\n",
 		(uint64_t)(lo | (uint64_t)hi << 32));
 	report_capability(procbased, 22, lo, hi);
+	
+	/* Procbased secondary controls */
+	rdmsr(IA32_VMX_PROCBASED_CTLS2, lo, hi);
+	pr_info("Secondary Procbased Controls MSR: 0x%llx\n",
+		(uint64_t)(lo | (uint64_t)hi << 32));
+	report_capability(procbased2, 28, lo, hi);
 
 	/* Exit controls */
 	rdmsr(IA32_VMX_EXIT_CTLS, lo, hi);
