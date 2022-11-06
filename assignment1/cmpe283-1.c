@@ -47,7 +47,7 @@ struct capability_info pinbased[5] =
  * Procbased capabilities 1
  * See SDM volume 3, section 24.6.2
  */
-struct capability_info procbased[5] =
+struct capability_info procbased[22] =
 {
 	{ 2, "Interrupt-window Exiting" },
 	{ 3, "Use TSC Offsetting" },
@@ -77,7 +77,7 @@ struct capability_info procbased[5] =
  * Exit capabilities
  * See SDM volume 3, section 24.7.1
  */
-struct capability_info exits[5] =
+struct capability_info exits[17] =
 {
 	{ 2, "Save Debug Controls" },
 	{ 9, "Host Addresss-space Size" },
@@ -102,7 +102,7 @@ struct capability_info exits[5] =
  * Entry capabilities
  * See SDM volume 3, section 24.8.1
  */
-struct capability_info entries[5] =
+struct capability_info entries[13] =
 {
 	{ 2, "Load Debug Controls" },
 	{ 9, "IA-32e Mode Guest" },
