@@ -6279,7 +6279,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
 
-static unsigned long long get_current_cpu_timestamp() {
+static unsigned long long get_current_cpu_timestamp(void) {
 	unsigned hi, lo;
 	__asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
 	return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
@@ -6459,7 +6459,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	if (!kvm_vmx_exit_handlers[exit_handler_index])
 		goto unexpected_vmexit;
 
-	int exit_handling_result = kvm_vmx_exit_handlers[exit_handler_index](vcpu);
+	int exit_handling_result;
+	exit_handling_result = kvm_vmx_exit_handlers[exit_handler_index](vcpu);
 
 	end_timestamp = get_current_cpu_timestamp();
 	cycles_in_VMM += end_timestamp - start_timestamp;
