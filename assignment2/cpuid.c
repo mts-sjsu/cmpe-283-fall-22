@@ -26,7 +26,8 @@
 #include "trace.h"
 #include "pmu.h"
 
-extern u32 total_exits;
+u32 total_exits = 0;
+EXPORT_SYMBOL(total_exits);
 
 /*
  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
@@ -1505,7 +1506,7 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
 
-	if (eax == 0x4fffffff) {
+	if (eax == 0x4FFFFFFC) {
 		eax = total_exits;
 	} else {
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);

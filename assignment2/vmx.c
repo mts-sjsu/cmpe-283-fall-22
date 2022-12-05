@@ -67,8 +67,7 @@
 #include "vmx.h"
 #include "x86.h"
 
-u32 total_exits = 0;
-EXPORT_SYMBOL(total_exits);
+extern u32 total_exits;
 
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
