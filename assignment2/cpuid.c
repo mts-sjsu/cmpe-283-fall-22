@@ -1461,19 +1461,19 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	entry = kvm_find_cpuid_entry_index(vcpu, function, index);
 	exact = !!entry;
 
-	if (!entry && !exact_only) {
-		if (function == 0x4ffffffc) {
-			printk("Called 0x4ffffffc");
-			*eax = total_exits;
-			return exact;
-		} else if (function == 0x4ffffffd) {
-			printk("Called 0x4ffffffd");
-			*ebx = cycles_in_VMM >> 32;
-			// ecx = (cycles_in_VMM << 32) >> 32;
-			*ecx = cycles_in_VMM;
-			return exact;
-		}
+	if (function == 0x4ffffffc) {
+		printk("Called 0x4ffffffc");
+		*eax = total_exits;
+		return exact;
+	} else if (function == 0x4ffffffd) {
+		printk("Called 0x4ffffffd");
+		*ebx = cycles_in_VMM >> 32;
+		// ecx = (cycles_in_VMM << 32) >> 32;
+		*ecx = cycles_in_VMM;
+		return exact;
+	}
 
+	if (!entry && !exact_only) {
 		entry = get_out_of_range_cpuid_entry(vcpu, &function, index);
 		used_max_basic = !!entry;
 	}
