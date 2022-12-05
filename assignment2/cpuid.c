@@ -27,7 +27,9 @@
 #include "pmu.h"
 
 u32 total_exits = 0;
+u64 cycles_in_VMM = 0;
 EXPORT_SYMBOL(total_exits);
+EXPORT_SYMBOL(cycles_in_VMM);
 
 /*
  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
@@ -1508,6 +1510,11 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 	if (eax == 0x4FFFFFFC) {
 		eax = total_exits;
+	} else if (eax == 0x4FFFFFFD) {
+		ebx = cycles_in_VMM >> 32;
+		// ecx = (cycles_in_VMM << 32) >> 32;
+		ecx = cycles_in_VMM;
+
 	} else {
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 	}

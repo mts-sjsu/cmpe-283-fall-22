@@ -68,6 +68,7 @@
 #include "x86.h"
 
 extern u32 total_exits;
+extern u64 cycles_in_VMM;
 
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
@@ -6278,6 +6279,14 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
 
+static unsigned long long get_current_cpu_timestamp() {
+	unsigned hi, lo;
+	__asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+	return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+}
+
+
+
 /*
  * The guest has exited.  See if we can fix it or if we need userspace
  * assistance.
@@ -6288,8 +6297,10 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	union vmx_exit_reason exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
 	u16 exit_handler_index;
+	unsigned long long start_timestamp, end_timestamp;
 
 	total_exits ++;
+	start_timestamp = get_current_cpu_timestamp();
 
 	/*
 	 * Flush logged GPAs PML buffer, this will make dirty_bitmap more
@@ -6448,7 +6459,13 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	if (!kvm_vmx_exit_handlers[exit_handler_index])
 		goto unexpected_vmexit;
 
-	return kvm_vmx_exit_handlers[exit_handler_index](vcpu);
+	int exit_handling_result = kvm_vmx_exit_handlers[exit_handler_index](vcpu);
+
+	end_timestamp = get_current_cpu_timestamp();
+	cycles_in_VMM += end_timestamp - start_timestamp;
+
+
+	return exit_handling_result;
 
 unexpected_vmexit:
 	vcpu_unimpl(vcpu, "vmx: unexpected exit reason 0x%x\n",
