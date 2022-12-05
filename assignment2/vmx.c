@@ -67,6 +67,9 @@
 #include "vmx.h"
 #include "x86.h"
 
+u32 total_exits = 0;
+EXPORT_SYMBOL(total_exits);
+
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
@@ -6275,8 +6278,6 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 		pr_err("Virtual processor ID = 0x%04x\n",
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
-
-u32 total_exits;
 
 /*
  * The guest has exited.  See if we can fix it or if we need userspace
