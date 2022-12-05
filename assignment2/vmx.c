@@ -6298,6 +6298,7 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	u32 vectoring_info = vmx->idt_vectoring_info;
 	u16 exit_handler_index;
 	unsigned long long start_timestamp, end_timestamp;
+	int exit_handling_result;
 
 	total_exits ++;
 	start_timestamp = get_current_cpu_timestamp();
@@ -6459,7 +6460,6 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	if (!kvm_vmx_exit_handlers[exit_handler_index])
 		goto unexpected_vmexit;
 
-	int exit_handling_result;
 	exit_handling_result = kvm_vmx_exit_handlers[exit_handler_index](vcpu);
 
 	end_timestamp = get_current_cpu_timestamp();
