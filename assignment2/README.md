@@ -19,7 +19,15 @@ I did this assignment on my own.
   > sudo apt-get install flex bison libssl-dev libelf-dev # Required for building linux
   > sudo apt-get install 
   ```
-3. Compile linux source code
+3. Collect required files
+   Copy both `cpuid.c` and `vmx.c` to corresponding location in linux 
+
+```shell
+> cp cpuid.c ~/linux/arch/x86/kvm
+> cp vmx.c ~/linx/arch/x86/kvm/vmx
+```
+
+4. Compile linux source code
 ```shell
 > sudo make oldconfig
 > sudo make 
@@ -28,7 +36,7 @@ I did this assignment on my own.
 > sudo make install
 ```
 
-4. Host guest VM
+1. Host guest VM
 ```shell
 > sudo apt-get install libvirt-daemon-system libvirt-clients virtinst bridge-utils cpu-checker
 
@@ -38,6 +46,5 @@ I did this assignment on my own.
  --disk path=/var/lib/libvirt/images/guest1-os.qcow2,format=qcow2,bus=virtio,size=5 \
   --graphics none  --location=/home/mute/CentOS-7-x86_64-DVD-2009.iso \
   --extra-args="console=tty0 console=ttyS0,115200"  --check all=off
-
 
 ```
