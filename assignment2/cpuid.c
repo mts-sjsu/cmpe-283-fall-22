@@ -1509,10 +1509,10 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	ecx = kvm_rcx_read(vcpu);
 
 	if (eax == 0x4ffffffc) {
-		printk("Called 0x4ffffffc")
+		printk("Called 0x4ffffffc");
 		eax = total_exits;
 	} else if (eax == 0x4ffffffd) {
-		printk("Called 0x4ffffffd")
+		printk("Called 0x4ffffffd");
 		ebx = cycles_in_VMM >> 32;
 		// ecx = (cycles_in_VMM << 32) >> 32;
 		ecx = cycles_in_VMM;
