@@ -26,6 +26,8 @@
 #include "trace.h"
 #include "pmu.h"
 
+extern u32 total_exits;
+
 /*
  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
  * aligned to sizeof(unsigned long) because it's not accessed via bitops.
@@ -1492,8 +1494,6 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	return exact;
 }
 EXPORT_SYMBOL_GPL(kvm_cpuid);
-
-extern u32 total_exits;
 
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
