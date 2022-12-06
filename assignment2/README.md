@@ -22,6 +22,7 @@ Copy the linux kernal into `~/linux` folder, then copy the modified `cpuid.c` an
 ```
 
 4. Compile linux source code
+   I am using the Linux kernel 5.15.81 found [here](https://www.kernel.org)
 ```shell
 > sudo make oldconfig
 # Might need to comment out
