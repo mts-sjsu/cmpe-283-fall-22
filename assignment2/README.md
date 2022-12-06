@@ -61,3 +61,5 @@ sudo dmesg
 ``` 
 This should show the newly implemented `printk` message in the host VM detailing the number of exits and number of cycles. 
 The screenshot shows the result, where the upper window is the inner VM, and the lower window is the host VM.
+![Screen Shot 2022-12-05 at 23 27 34](https://user-images.githubusercontent.com/100324756/205848844-b05354df-823c-4bac-922f-3bc45668e8e8.png)
+
