@@ -37,14 +37,17 @@ I did this assignment on my own.
 ```
 
 1. Host guest VM
+Create a default config file `ubuntu_config` for the ubuntu image:
+```text
+password: ubuntu
+ssh_pwauth: True
+chpasswd: { expire: False }
+```
+
+
 ```shell
-> sudo apt-get install libvirt-daemon-system libvirt-clients virtinst bridge-utils cpu-checker
-
-
-> virt-install  --network bridge:virbr0 --name guest1 \
- --os-variant=centos7.0 --ram=1024 --vcpus=1  \
- --disk path=/var/lib/libvirt/images/guest1-os.qcow2,format=qcow2,bus=virtio,size=5 \
-  --graphics none  --location=/home/mute/CentOS-7-x86_64-DVD-2009.iso \
-  --extra-args="console=tty0 console=ttyS0,115200"  --check all=off
+> sudo apt-get install qemu-kvm cloud-image-utils
+> cloud-localds guest.img ubuntu_config
+> sudo qemu-system-x86_64 -enable-kvm -hda bionic.img -drive "file=guest.img,format=raw" -m 1024 -display curses -nographic
 
 ```

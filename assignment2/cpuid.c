@@ -1522,13 +1522,13 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
 
-	if (eax == 0x4ffffffc) {
+	if (eax == 0x4FFFFFFC) {
 		eax = total_exits;
-		printk("CPUID(0x4FFFFFFC): exits=%u", eax);
+		printk(KERN_INFO "CPUID(0x4FFFFFFC): exits=%u\n", eax);
 	} else if (eax == 0x4ffffffd) {
-		ebx = cycles_in_VMM >> 32;
+		ebx = (cycles_in_VMM >> 32) * 0xFFFFFFFF;
 		ecx = cycles_in_VMM;
-		printk("CPUID(0x4FFFFFFD): total time in vmm: %u%u cycles", ebx, ecx);
+		printk(KERN_INFO "CPUID(0x4FFFFFFD): total time in vmm: %llu cycles\n", cycles_in_VMM);
 	} else {
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 	}
