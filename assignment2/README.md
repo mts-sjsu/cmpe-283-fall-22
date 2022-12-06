@@ -11,7 +11,7 @@ I did this assignment on my own.
   ```shell
   > sudo apt-get update
   > sudo apt-get install gcc make
-  > sudo apt-get install flex bison libssl-dev libelf-dev # Required for building linux
+  > sudo apt-get install flex bison libssl-dev libelf-dev pahole # Required for building linux
   ```
 3. Collect required files
 Copy the linux kernal into `~/linux` folder, then copy the modified `cpuid.c` and `vmx.c` to their corresponding locations.
@@ -21,17 +21,18 @@ Copy the linux kernal into `~/linux` folder, then copy the modified `cpuid.c` an
 > cp vmx.c ~/linx/arch/x86/kvm/vmx
 ```
 
-1. Compile linux source code
+4. Compile linux source code
 ```shell
 > sudo make oldconfig
+# Might need to comment out
 > sudo make 
 > sudo make modules
-> sudo make modules_install
+> sudo make INSTALL_MOD_STRIP=1 modules_install
 > sudo make install
 > reboot
 ```
 
-1. Host guest VM
+5. Host guest VM
 Create a default config file `ubuntu_config` for the ubuntu image:
 ```text
 password: ubuntu
@@ -58,3 +59,4 @@ And in the host/outer VM run
 sudo dmesg
 ``` 
 This should show the newly implemented `printk` message in the host VM detailing the number of exits and number of cycles. 
+The screenshot shows the result, where the upper window is the inner VM, and the lower window is the host VM.
