@@ -67,9 +67,6 @@
 #include "vmx.h"
 #include "x86.h"
 
-extern u32 total_exits;
-extern u64 cycles_in_VMM;
-
 MODULE_AUTHOR("Qumranet");
 MODULE_LICENSE("GPL");
 
@@ -6299,6 +6296,9 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	u16 exit_handler_index;
 	unsigned long long start_timestamp, end_timestamp;
 	int exit_handling_result;
+
+	extern u32 total_exits;
+	extern u64 cycles_in_VMM;
 
 	total_exits ++;
 	start_timestamp = get_current_cpu_timestamp();
