@@ -26,11 +26,18 @@
 #include "pmu.h"
 
 // These variables have to be defined here, instead of vmx.c to break
-// dependency cycles
-u32 total_exits = 0;
-u64 cycles_in_VMM = 0;
-EXPORT_SYMBOL(total_exits);
-EXPORT_SYMBOL(cycles_in_VMM);
+// dependency cycles. Using a linked list here to dynamically grow when
+// encountering new exit reason
+typeof struct ummm {
+	u32 reason;
+	u32 count;
+	unsigned long long cycles;
+	struct ummm* next;
+} exit_reason_count;
+
+exit_reason_count* exit_count = NULL;
+
+EXPORT_SYMBOL(exit_count);
 
 /*
  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
@@ -1244,6 +1251,9 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
+	u16 length;
+	exit_reason_count* head;
+
 
 	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
 		return 1;
@@ -1258,6 +1268,16 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 		ebx = (cycles_in_VMM >> 32) & 0xFFFFFFFF;
 		ecx = cycles_in_VMM & 0xFFFFFFFF;
 		printk(KERN_INFO "CPUID(0x4FFFFFFD): total time in vmm: %llu cycles\n", cycles_in_VMM);
+	} else if (eax == 0x4FFFFFFE) {
+		head = exit_count;
+		length = 0;
+		while (head != NULL) {
+			head = head -> next;
+			length ++;
+		}
+
+		printk(KERN_INFO "CPUID(0x4FFFFFFC): # of different exits=%u\n", length);
+
 	} else {
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 	}

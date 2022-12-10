@@ -5962,8 +5962,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
 
-extern u32 total_exits;
-extern u64 cycles_in_VMM;
+extern exit_reason_count* exit_count;
 
 static unsigned long long get_current_cpu_timestamp(void) {
 	unsigned hi, lo;
@@ -5971,8 +5970,26 @@ static unsigned long long get_current_cpu_timestamp(void) {
 	return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
 }
 
-static void increment_exit_count(u32 reason) {
+static void increment_exit_count(u32 reason, unsigned long long cycles) {
+	exit_reason_count* head, prev;
+
+	head = exit_count;
+	prev = exit_count;
 	
+	while (head != NULL) {
+		if (head->reason == reason) {
+			head -> count ++;
+			head -> cycles += cycles;
+			return;
+		}
+		prev = head;
+		head = head -> next;
+	}
+	exit_reason_count* new_count = malloc(sizeof exit_reason_count);
+	new_count -> reason = reason;
+	new_count -> count = 1;
+	new_count -> cycles = cycles;
+	prev -> next = new_count;
 }
 
 /*
