@@ -3,6 +3,8 @@
 ## Team
 I did this assignment on my own.
 
+---------- 
+
 ## Steps
 1. Starting from assignment 2
 2. I keep the original implementation for assignment 2, meaning I'm in effect double counting for the same result, but I think that's ok for the purpose of this assignment. I would like to have something working along the way of developing, so I did not modify any assignment 2 logic.
@@ -28,28 +30,32 @@ struct exit_reason_count {
 > cpuid -l 0x4FFFFFFF -s 0x4FFFFFFF
 ```
 
-## Results
-| ID  | Exit Count  | Reason |
-|---|---|---|
-| 0  | 11  | Exception or non-maskable interrupt  |
-| 10  | 57308  | CPUID attempted  |
-| 28  | 109241  | Control-register accesses |
-| 29  | 1  | MOV DR  |
-| 30  | 1000885  | I/O instruction |
-| 31  | 968  | RDMSR  |
-| 48  | 10825  | EPT violation   |
-| 54  | 6  | WBINVD or WBNOINVD  |
+---------- 
 
-| ID  | Cycles  | Cycles/exit | Reason |
+## Results
+| ID  | Reason | Exit Count  | 
+|---|---|---|
+| 0  | Exception or non-maskable interrupt  |11  | 
+| 10  | CPUID attempted  | 57308  |
+| 28  | Control-register accesses | 109241  |
+| 29  | MOV DR  | 1  |
+| 30  | I/O instruction | 1000885  |
+| 31  | RDMSR  | 968  |
+| 48  | EPT violation   | 10825  |
+| 54  | WBINVD or WBNOINVD  | 6  |
+
+| ID  | Reason | Cycles  | Cycles/exit |
 |---|---|---|---|
-| 0  | 1400544 | 127322 | Exception or non-maskable interrupt  |
-| 10  | 35456104  | 619 |CPUID attempted  |
-| 28  | 105881081 | 969 | Control-register accesses |
-| 29  | 7801  | 7801 | MOV DR  |
-| 30  | 2410754341  | 2409 | I/O instruction |
-| 31  | 3273238 | 3381 | RDMSR  |
-| 48  | 294671600 | 27221 | EPT violation   |
-| 54  | 4225 | 704 | WBINVD or WBNOINVD  |
+| 0  | Exception or non-maskable interrupt  | 1400544 | 127322 |
+| 10  | CPUID attempted | 35456104  | 619 |
+| 28  | Control-register accesses | 105881081 | 969 |
+| 29  | MOV DR | 7801 | 7801 |
+| 30  | I/O instruction | 2410754341 | 2409 |
+| 31  | RDMSR  | 3273238 | 3381 |
+| 48  | EPT violation   | 294671600 | 27221 |
+| 54  | WBINVD or WBNOINVD | 4225 | 704 |
+
+---------- 
 
 ## Questions
 1. Comment on the frequency of exits – does the number of exits increase at a stable rate? Or are there more exits performed during certain VM operations? Approximately how many exits does a full VM boot entail? 
