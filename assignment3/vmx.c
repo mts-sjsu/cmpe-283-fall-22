@@ -5962,16 +5962,34 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
 
-extern exit_reason_count* exit_count;
+// ***** Assignment 2
+extern u32 total_exits;
+extern u64 cycles_in_VMM;
 
 static unsigned long long get_current_cpu_timestamp(void) {
 	unsigned hi, lo;
 	__asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
 	return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
 }
+// ***** Assignment 2
 
+
+// ***** Assignment 3
+/**
+ * @brief Redefining the struct here cuz I'm too lazy to properly manage import/export
+ * 
+ */
+struct exit_reason_count {
+	u32 reason;
+	u32 count;
+	unsigned long long cycles;
+	struct exit_reason_count* next;
+};
+
+extern struct exit_reason_count* exit_count;
 static void increment_exit_count(u32 reason, unsigned long long cycles) {
-	exit_reason_count* head, prev;
+	struct exit_reason_count *head, *prev;
+	struct exit_reason_count new_count;
 
 	head = exit_count;
 	prev = exit_count;
@@ -5985,12 +6003,12 @@ static void increment_exit_count(u32 reason, unsigned long long cycles) {
 		prev = head;
 		head = head -> next;
 	}
-	exit_reason_count* new_count = malloc(sizeof exit_reason_count);
-	new_count -> reason = reason;
-	new_count -> count = 1;
-	new_count -> cycles = cycles;
-	prev -> next = new_count;
+	new_count.reason = reason;
+	new_count.count = 1;
+	new_count.cycles = cycles;
+	prev -> next = &new_count;
 }
+// ***** Assignment 3
 
 /*
  * The guest has exited.  See if we can fix it or if we need userspace
@@ -6007,7 +6025,10 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 
 	total_exits ++;
 	start_timestamp = get_current_cpu_timestamp();
-	increment_exit_count(exit_reason.full);
+
+	if (total_exits % 500000 == 0) {
+		printk(KERN_INFO "vmx_handle_exit %u\n", counter);
+	}
 
 	/*
 	 * Flush logged GPAs PML buffer, this will make dirty_bitmap more
@@ -6167,8 +6188,15 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 
 	exit_handling_result = kvm_vmx_exit_handlers[exit_handler_index](vcpu);
 
+	// ***** Assignment 2
 	end_timestamp = get_current_cpu_timestamp();
 	cycles_in_VMM += end_timestamp - start_timestamp;
+	// ***** Assignment 2
+
+	// ***** Assignment 3
+	// end_timestamp = get_current_cpu_timestamp() - start_timestamp;
+	// increment_exit_count(exit_reason.full, cycle_ellapsed);
+	// ***** Assignment 3
 
 	return exit_handling_result;	
 

@@ -25,19 +25,30 @@
 #include "trace.h"
 #include "pmu.h"
 
+// **** Assignment 2
 // These variables have to be defined here, instead of vmx.c to break
-// dependency cycles. Using a linked list here to dynamically grow when
-// encountering new exit reason
-typeof struct ummm {
+// dependency cycles.
+u32 total_exits = 0;
+u64 cycles_in_VMM = 0;
+EXPORT_SYMBOL(total_exits);
+EXPORT_SYMBOL(cycles_in_VMM);
+// **** Assignment 2
+
+
+
+// **** Assignment 3
+struct exit_reason_count {
 	u32 reason;
 	u32 count;
 	unsigned long long cycles;
-	struct ummm* next;
-} exit_reason_count;
+	struct exit_reason_count* next;
+};
 
-exit_reason_count* exit_count = NULL;
+struct exit_reason_count* exit_count = NULL;
 
 EXPORT_SYMBOL(exit_count);
+// **** Assignment 2
+
 
 /*
  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
@@ -1251,8 +1262,11 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
+
+	// ***** Assignment 3
 	u16 length;
-	exit_reason_count* head;
+	struct exit_reason_count* head;
+	// ***** Assignment 3
 
 
 	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
@@ -1261,6 +1275,7 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
 
+	// ***** Assignment 2
 	if (eax == 0x4FFFFFFC) {
 		eax = total_exits;
 		printk(KERN_INFO "CPUID(0x4FFFFFFC): exits=%u\n", eax);
@@ -1268,6 +1283,8 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 		ebx = (cycles_in_VMM >> 32) & 0xFFFFFFFF;
 		ecx = cycles_in_VMM & 0xFFFFFFFF;
 		printk(KERN_INFO "CPUID(0x4FFFFFFD): total time in vmm: %llu cycles\n", cycles_in_VMM);
+	// ***** Assignment 2
+	// ***** Assignment 3
 	} else if (eax == 0x4FFFFFFE) {
 		head = exit_count;
 		length = 0;
@@ -1278,6 +1295,7 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 
 		printk(KERN_INFO "CPUID(0x4FFFFFFC): # of different exits=%u\n", length);
 
+	// ***** Assignment 3
 	} else {
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 	}
