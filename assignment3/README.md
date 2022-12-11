@@ -28,7 +28,6 @@ struct exit_reason_count {
 > cpuid -l 0x4FFFFFFF -s 0x4FFFFFFF
 ```
 
-
 ## Results
 | ID  | Exit Count  | Reason |
 |---|---|---|
@@ -52,7 +51,6 @@ struct exit_reason_count {
 | 48  | 294671600 | 27221 | EPT violation   |
 | 54  | 4225 | 704 | WBINVD or WBNOINVD  |
 
-
 ## Questions
 1. Comment on the frequency of exits – does the number of exits increase at a stable rate? Or are there more exits performed during certain VM operations? Approximately how many exits does a full VM boot entail? 
    1. In my case a full VM boot takes about `800k - 900k` exits. This would take the user to login, and there're around `500k` more after logging in. 
@@ -60,9 +58,6 @@ struct exit_reason_count {
 2. Of the exit types defined in the SDM, which are the most frequent? Least?
    1. The most frequent one is the `I/O` instruction, and the least frequent is the `MOV DR`. 
 
-
-
-
-
 ## Screenshot of the Execution
 Note that the upper window is the inner VM, and the lower window is the host VM with my custom CPUID implemented.
+<img width="743" alt="Screen Shot 2022-12-11 at 02 26 37" src="https://user-images.githubusercontent.com/100324756/206931093-cf5af917-58a1-4153-84ee-f8d166386804.png">
