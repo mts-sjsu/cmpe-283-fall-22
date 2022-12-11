@@ -15,7 +15,7 @@
 #include <linux/uaccess.h>
 #include <linux/sched/stat.h>
 
-#include <asm/processor.h>
+#include <asm/process	or.h>
 #include <asm/user.h>
 #include <asm/fpu/xstate.h>
 #include <asm/sgx.h>
@@ -34,20 +34,12 @@ EXPORT_SYMBOL(total_exits);
 EXPORT_SYMBOL(cycles_in_VMM);
 // **** Assignment 2
 
-
-
 // **** Assignment 3
-struct exit_reason_count {
-	u32 reason;
-	u32 count;
-	unsigned long long cycles;
-	struct exit_reason_count* next;
-};
-
-struct exit_reason_count* exit_count = NULL;
+struct exit_reason_count initial = {0, 0, 0};
+struct exit_reason_count* exit_count = &initial;
 
 EXPORT_SYMBOL(exit_count);
-// **** Assignment 2
+// **** Assignment 3
 
 
 /*
@@ -1293,7 +1285,7 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 			length ++;
 		}
 
-		printk(KERN_INFO "CPUID(0x4FFFFFFC): # of different exits=%u\n", length);
+		printk(KERN_INFO "CPUID(0x4FFFFFFE): # of different exits=%u\n", length);
 
 	// ***** Assignment 3
 	} else {

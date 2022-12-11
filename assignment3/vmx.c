@@ -5979,15 +5979,17 @@ static unsigned long long get_current_cpu_timestamp(void) {
  * @brief Redefining the struct here cuz I'm too lazy to properly manage import/export
  * 
  */
-struct exit_reason_count {
-	u32 reason;
-	u32 count;
-	unsigned long long cycles;
-	struct exit_reason_count* next;
-};
+// struct exit_reason_count {
+// 	u32 reason;
+// 	u32 count;
+// 	unsigned long long cycles;
+// 	struct exit_reason_count* next;
+// };
 
 extern struct exit_reason_count* exit_count;
 static void increment_exit_count(u32 reason, unsigned long long cycles) {
+	// printk(KERN_INFO "increment_exit_count: %u\t%llu\n", reason, cycles);
+
 	struct exit_reason_count *head, *prev;
 	struct exit_reason_count new_count;
 
@@ -5998,15 +6000,29 @@ static void increment_exit_count(u32 reason, unsigned long long cycles) {
 		if (head->reason == reason) {
 			head -> count ++;
 			head -> cycles += cycles;
+			
 			return;
 		}
 		prev = head;
+ 		if (total_exits % 250000 == 0) {
+			printk(KERN_INFO "looping through reasons: %u\n", head->reason);
+		}
 		head = head -> next;
 	}
 	new_count.reason = reason;
 	new_count.count = 1;
 	new_count.cycles = cycles;
-	prev -> next = &new_count;
+	new_count.next = NULL;
+
+	if (total_exits % 250000 == 0) {
+	// 	printk (KERN_INFO "Looped through the while %u\n", total_exits);
+	// 	printk (KERN_INFO "reason: %u, cycles: %llu\n", reason, cycles);
+		printk(KERN_INFO "Inserting new exit reason %u\n", reason);
+		if (prev == NULL){
+			printk(KERN_INFO "But prev is null QQQ...\n");
+		}
+	}
+	// prev -> next = &new_count;
 }
 // ***** Assignment 3
 
@@ -6020,14 +6036,19 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	union vmx_exit_reason exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
 	u16 exit_handler_index;
-	unsigned long long start_timestamp, end_timestamp;
+	unsigned long long start_timestamp, end_timestamp, cycle_ellapsed;
 	int exit_handling_result;
+
+	if (total_exits == 0) {
+		printk(KERN_INFO "exit_count: reason: %u, count: %u, cycles: %llu\n", 
+			exit_count -> reason, exit_count -> count, exit_count -> cycles);
+	}
 
 	total_exits ++;
 	start_timestamp = get_current_cpu_timestamp();
 
 	if (total_exits % 500000 == 0) {
-		printk(KERN_INFO "vmx_handle_exit %u\n", counter);
+		printk(KERN_INFO "vmx_handle_exit %u\n", total_exits);
 	}
 
 	/*
@@ -6194,8 +6215,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	// ***** Assignment 2
 
 	// ***** Assignment 3
-	// end_timestamp = get_current_cpu_timestamp() - start_timestamp;
-	// increment_exit_count(exit_reason.full, cycle_ellapsed);
+	cycle_ellapsed = get_current_cpu_timestamp() - start_timestamp;
+	increment_exit_count(exit_reason.full, cycle_ellapsed);
 	// ***** Assignment 3
 
 	return exit_handling_result;	
