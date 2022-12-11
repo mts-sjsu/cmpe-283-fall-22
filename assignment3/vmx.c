@@ -5991,7 +5991,7 @@ static void increment_exit_count(u32 reason, unsigned long long cycles) {
 	// printk(KERN_INFO "increment_exit_count: %u\t%llu\n", reason, cycles);
 
 	struct exit_reason_count *head, *prev;
-	struct exit_reason_count new_count;
+	struct exit_reason_count *new_count = (struct exit_reason_count *)kmalloc(sizeof (struct exit_reason_count), GFP_KERNEL);
 
 	head = exit_count;
 	prev = exit_count;
@@ -6001,28 +6001,29 @@ static void increment_exit_count(u32 reason, unsigned long long cycles) {
 			head -> count ++;
 			head -> cycles += cycles;
 			
+			kfree(new_count);
 			return;
 		}
 		prev = head;
  		if (total_exits % 250000 == 0) {
-			printk(KERN_INFO "looping through reasons: %u\n", head->reason);
+			// printk(KERN_INFO "looping through reasons: %u\n", head->reason);
 		}
 		head = head -> next;
 	}
-	new_count.reason = reason;
-	new_count.count = 1;
-	new_count.cycles = cycles;
-	new_count.next = NULL;
+	new_count->reason = reason;
+	new_count->count = 1;
+	new_count->cycles = cycles;
+	new_count->next = NULL;
 
 	if (total_exits % 250000 == 0) {
 	// 	printk (KERN_INFO "Looped through the while %u\n", total_exits);
 	// 	printk (KERN_INFO "reason: %u, cycles: %llu\n", reason, cycles);
 		printk(KERN_INFO "Inserting new exit reason %u\n", reason);
 		if (prev == NULL){
-			printk(KERN_INFO "But prev is null QQQ...\n");
+			// printk(KERN_INFO "But prev is null QQQ...\n");
 		}
 	}
-	// prev -> next = &new_count;
+	prev -> next = new_count;
 }
 // ***** Assignment 3
 
@@ -6048,7 +6049,7 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	start_timestamp = get_current_cpu_timestamp();
 
 	if (total_exits % 500000 == 0) {
-		printk(KERN_INFO "vmx_handle_exit %u\n", total_exits);
+		// printk(KERN_INFO "vmx_handle_exit %u\n", total_exits);
 	}
 
 	/*

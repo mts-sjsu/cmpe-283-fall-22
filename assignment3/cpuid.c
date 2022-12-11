@@ -15,7 +15,7 @@
 #include <linux/uaccess.h>
 #include <linux/sched/stat.h>
 
-#include <asm/process	or.h>
+#include <asm/processor.h>
 #include <asm/user.h>
 #include <asm/fpu/xstate.h>
 #include <asm/sgx.h>
@@ -1281,12 +1281,47 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 		head = exit_count;
 		length = 0;
 		while (head != NULL) {
+			if (head -> reason == ecx) {
+				printk(KERN_INFO "CPUID(0x4FFFFFFE): number of exit for %u: %u\n", head->reason, head->count);
+				eax = head -> count;
+				break;
+			}
 			head = head -> next;
 			length ++;
 		}
 
-		printk(KERN_INFO "CPUID(0x4FFFFFFE): # of different exits=%u\n", length);
+		if (head == NULL) {
+			printk(KERN_INFO "\n\n***********\nCPUID(0x4FFFFFFE): Cannot find requested exit reason. Printing all:");
+			head = exit_count;
+			while (head != NULL) {
+				printk(KERN_INFO "Reason: %u\t- %u\n", head->reason, head->count);
+				head = head -> next;
+				length ++;
+			}
+		}
+	} else if (eax == 0x4FFFFFFF) {
+		head = exit_count;
+		length = 0;
+		while (head != NULL) {
+			if (head -> reason == ecx) {
+				ebx = ((head->cycles) >> 32) & 0xFFFFFFFF;
+				ecx = (head->cycles) & 0xFFFFFFFF;
+				printk(KERN_INFO "CPUID(0x4FFFFFFF): number of cycles for %u: %llu\n", head->reason, head->cycles);
+				break;
+			}
+			head = head -> next;
+			length ++;
+		}
 
+		if (head == NULL) {
+			printk(KERN_INFO "\n\n***********\nCPUID(0x4FFFFFFF): Cannot find requested exit reason. Printing all:");
+			head = exit_count;
+			while (head != NULL) {
+				printk(KERN_INFO "Reason: %u\t- %llu\n", head->reason, head->cycles);
+				head = head -> next;
+				length ++;
+			}
+		}	
 	// ***** Assignment 3
 	} else {
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
